@@ -1,7 +1,11 @@
-export default function ErrorMessage({ message }) {
+import { memo } from 'react';
+
+function ErrorMessageComponent({ message }) {
   return (
-    <div className="error-box">
-      <strong>Ошибка:</strong> {message}
+    <div className="error" role="alert">
+      {message}
     </div>
   );
 }
+
+export const ErrorMessage = memo(ErrorMessageComponent);

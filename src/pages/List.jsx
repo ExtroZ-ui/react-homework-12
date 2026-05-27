@@ -1,36 +1,35 @@
-import { useEffect } from 'react';
-import ErrorMessage from '../components/ErrorMessage.jsx';
-import Loader from '../components/Loader.jsx';
-import ProductCard from '../components/ProductCard.jsx';
+import { useEffect, useMemo } from 'react';
+import { ErrorMessage } from '../components/ErrorMessage.jsx';
+import { Loader } from '../components/Loader.jsx';
+import { ProductCard } from '../components/ProductCard.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 
 export default function List() {
-  const { products, loading, error, loadProducts } = useProducts();
+  const { products, isLoading, error, loadProducts } = useProducts();
 
   useEffect(() => {
-    const controller = new AbortController();
-    loadProducts(controller.signal);
-
-    return () => controller.abort();
+    loadProducts();
   }, [loadProducts]);
+
+  const sortedProducts = useMemo(
+    () => [...products].sort((firstProduct, secondProduct) => firstProduct.title.localeCompare(secondProduct.title)),
+    [products],
+  );
 
   return (
     <section>
       <div className="page-title">
-        <p className="meta">/list</p>
+        <p className="eyebrow">Каталог</p>
         <h1>Список товаров</h1>
-        <p>
-          Данные загружаются из API и сохраняются в глобальном состоянии,
-          чтобы не делать повторный запрос при переходе на страницу товара.
-        </p>
+        <p>Данные загружаются из внешнего API и сохраняются в контексте приложения.</p>
       </div>
 
-      {loading && <Loader />}
+      {isLoading && <Loader />}
       {error && <ErrorMessage message={error} />}
 
-      {!loading && !error && (
+      {!isLoading && !error && (
         <div className="grid">
-          {products.map((product) => (
+          {sortedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

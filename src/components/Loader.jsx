@@ -1,8 +1,11 @@
-export default function Loader() {
+import { memo } from 'react';
+
+function LoaderComponent() {
   return (
-    <div className="loader-wrap">
-      <div className="loader" />
-      <span>Загрузка данных...</span>
+    <div className="loader" role="status" aria-live="polite">
+      Загрузка данных...
     </div>
   );
 }
+
+export const Loader = memo(LoaderComponent);

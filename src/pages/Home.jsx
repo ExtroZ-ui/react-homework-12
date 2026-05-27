@@ -1,18 +1,16 @@
-import { Link } from 'react-router-dom';
-
 export default function Home() {
   return (
     <section className="hero">
       <div>
-        <p className="meta">Домашнее задание 12</p>
-        <h1>Каталог товаров на React</h1>
+        <p className="eyebrow">Домашние задания 12 и 13</p>
+        <h1>React-приложение интернет-магазина</h1>
         <p>
-          Приложение показывает работу маршрутизации, загрузку данных из API,
-          обработку ошибок и управление избранными товарами через Context API.
+          В проекте реализованы маршрутизация, загрузка данных из API, глобальное состояние,
+          избранное, оптимизация компонентов, ленивые страницы и тесты.
         </p>
-        <Link className="button button-primary hero-button" to="/list">
+        <a className="button" href="/list">
           Перейти в каталог
-        </Link>
+        </a>
       </div>
     </section>
   );

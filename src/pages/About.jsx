@@ -1,18 +1,21 @@
 export default function About() {
   return (
-    <section className="content-card">
-      <p className="meta">/about</p>
-      <h1>О проекте</h1>
+    <section className="about-card">
+      <p className="eyebrow">О проекте</p>
+      <h1>Интернет-магазин на React</h1>
       <p>
-        Это учебное React-приложение для темы «Основной и продвинутый React.
-        Компоненты, состояние и хуки».
+        Это учебное приложение для дисциплины «Разработка прототипов программных решений».
+        Проект показывает работу с React Router, API-запросами, Context API, localStorage,
+        оптимизацией компонентов и тестированием.
       </p>
-      <p>
-        В проекте реализованы обязательные пункты задания: маршрутизация,
-        навигация через NavLink, загрузка списка товаров из API, детальная
-        страница товара, индикатор загрузки, обработка ошибок и глобальное
-        состояние через Context API.
-      </p>
+
+      <ul className="feature-list">
+        <li>Маршрутизация: главная, каталог, карточка товара, избранное, информация о проекте.</li>
+        <li>Работа с сетью: загрузка списка товаров и подробной информации через API.</li>
+        <li>Состояние: избранное хранится в Context API и сохраняется в localStorage.</li>
+        <li>Оптимизация: React.memo, useMemo, useCallback, React.lazy и Suspense.</li>
+        <li>Тестирование: Jest и React Testing Library.</li>
+      </ul>
     </section>
   );
 }

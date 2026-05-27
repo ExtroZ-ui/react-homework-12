@@ -1,43 +1,68 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import ErrorMessage from '../components/ErrorMessage.jsx';
-import Loader from '../components/Loader.jsx';
-import { useFavorites } from '../context/FavoritesContext.jsx';
+import { fetchProductById } from '../api/productsApi.js';
+import { ErrorMessage } from '../components/ErrorMessage.jsx';
+import { Loader } from '../components/Loader.jsx';
+import { useFavourites } from '../context/FavouritesContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 
 export default function Details() {
   const { id } = useParams();
-  const { loadProductById, getProductById } = useProducts();
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-
-  const [product, setProduct] = useState(() => getProductById(id));
-  const [loading, setLoading] = useState(!product);
+  const { getProductFromCache } = useProducts();
+  const { addToFavourites, isFavourite } = useFavourites();
+  const [product, setProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
+    let ignore = false;
 
-    async function loadDetails() {
+    async function loadProduct() {
+      const cachedProduct = getProductFromCache(id);
+
+      if (cachedProduct) {
+        setProduct(cachedProduct);
+        return;
+      }
+
       try {
-        setLoading(true);
+        setIsLoading(true);
         setError('');
-        const productData = await loadProductById(id, controller.signal);
-        setProduct(productData);
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          setError(err.message || 'Не удалось загрузить данные товара');
+        const loadedProduct = await fetchProductById(id);
+
+        if (!ignore) {
+          setProduct(loadedProduct);
+        }
+      } catch (requestError) {
+        if (!ignore) {
+          setError(requestError.message || 'Ошибка загрузки товара');
         }
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setIsLoading(false);
+        }
       }
     }
 
-    loadDetails();
+    loadProduct();
 
-    return () => controller.abort();
-  }, [id, loadProductById]);
+    return () => {
+      ignore = true;
+    };
+  }, [id, getProductFromCache]);
 
-  if (loading) {
+  const mainImage = useMemo(
+    () => product?.images?.[0] || product?.thumbnail || '',
+    [product],
+  );
+
+  const handleAddToFavourites = useCallback(() => {
+    if (product) {
+      addToFavourites(product);
+    }
+  }, [product, addToFavourites]);
+
+  if (isLoading) {
     return <Loader />;
   }
 
@@ -46,48 +71,37 @@ export default function Details() {
   }
 
   if (!product) {
-    return <ErrorMessage message="Товар не найден" />;
+    return null;
   }
 
-  const favorite = isFavorite(product.id);
-
-  const handleFavoriteClick = () => {
-    if (favorite) {
-      removeFromFavorites(product.id);
-    } else {
-      addToFavorites(product);
-    }
-  };
-
   return (
-    <section className="details">
-      <Link className="back-link" to="/list">← Назад к каталогу</Link>
+    <section>
+      <Link to="/list" className="back-link">
+        ← Вернуться в каталог
+      </Link>
 
-      <div className="details-card">
-        <div className="details-image-wrap">
-          <img
-            className="details-image"
-            src={product.thumbnail || product.images?.[0]}
-            alt={product.title}
-          />
+      <article className="details">
+        <div className="details-image-wrapper">
+          <img className="details-image" src={mainImage} alt={product.title} />
         </div>
 
-        <div className="details-info">
-          <p className="meta">{product.brand || 'Без бренда'} / {product.category}</p>
+        <div className="details-content">
+          <p className="eyebrow">{product.category}</p>
           <h1>{product.title}</h1>
-          <p className="details-description">{product.description}</p>
+          <p>{product.description}</p>
 
           <div className="details-meta">
-            <span>Цена: <strong>${product.price}</strong></span>
-            <span>Рейтинг: <strong>★ {product.rating}</strong></span>
-            <span>Остаток: <strong>{product.stock} шт.</strong></span>
+            <span>Цена: {product.price} $</span>
+            <span>Скидка: {product.discountPercentage}%</span>
+            <span>Рейтинг: {product.rating}</span>
+            <span>Бренд: {product.brand || 'не указан'}</span>
           </div>
 
-          <button className="button button-primary" onClick={handleFavoriteClick}>
-            {favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+          <button type="button" className="button" onClick={handleAddToFavourites}>
+            {isFavourite(product.id) ? 'Добавить ещё раз' : 'Добавить в избранное'}
           </button>
         </div>
-      </div>
+      </article>
     </section>
   );
 }

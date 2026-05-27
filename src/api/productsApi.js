@@ -1,20 +1,20 @@
-const API_URL = import.meta.env.VITE_API_URL || 'https://dummyjson.com';
+const API_URL = 'https://dummyjson.com/products';
 
-async function request(path, signal) {
-  const response = await fetch(`${API_URL}${path}`, { signal });
+async function requestJson(url) {
+  const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`Ошибка запроса: ${response.status} ${response.statusText}`);
+    throw new Error('Не удалось получить данные с сервера');
   }
 
   return response.json();
 }
 
-export async function fetchProducts(signal) {
-  const data = await request('/products?limit=12', signal);
-  return data.products ?? [];
+export async function fetchProducts() {
+  const data = await requestJson(`${API_URL}?limit=12`);
+  return data.products;
 }
 
-export async function fetchProductById(id, signal) {
-  return request(`/products/${id}`, signal);
+export async function fetchProductById(id) {
+  return requestJson(`${API_URL}/${id}`);
 }
