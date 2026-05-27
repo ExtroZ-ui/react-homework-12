@@ -1,6 +1,5 @@
 # React Shop Catalog — домашнее задание 12
 
-Учебное React-приложение по теме **«Основной и продвинутый React. Компоненты, состояние и хуки»**.
 
 ## Что реализовано
 
@@ -23,8 +22,6 @@
 ```env
 VITE_API_URL=https://dummyjson.com
 ```
-
-Если нужно подключить свой backend из предыдущего модуля, измените `VITE_API_URL` в `.env` и при необходимости адаптируйте файл:
 
 ```text
 src/api/productsApi.js
@@ -108,17 +105,4 @@ npm run build
 npm run preview
 ```
 
-## Деплой
 
-Проект можно развернуть на Vercel или Netlify.
-
-Для Vercel:
-
-1. Загрузить проект в открытый GitHub-репозиторий.
-2. Зайти на Vercel.
-3. Нажать **Add New Project**.
-4. Выбрать репозиторий.
-5. Framework Preset: **Vite**.
-6. Build Command: `npm run build`.
-7. Output Directory: `dist`.
-8. После деплоя добавить ссылку на приложение в ЛМС.
